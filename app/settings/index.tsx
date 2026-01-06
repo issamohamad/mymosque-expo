@@ -10,6 +10,14 @@ import {
   savePrayerNotificationSettings,
   schedulePrayerNotifications,
 } from "@/lib/prayerNotifications";
+import {
+  loadLocationSettings,
+  saveLocationSettings,
+  LocationSettings,
+  getPopularCountries,
+  getAvailableCalculationMethods,
+  getCalculationMethodName,
+} from "@/lib/locationSettings";
 import { JummahTime, MosqueInfo } from "@/lib/types";
 import { fetchMosqueInfo } from "@/lib/utils";
 import { Ionicons } from "@expo/vector-icons";
@@ -59,6 +67,9 @@ export default function Settings() {
   const [jummahTimes, setJummahTimes] = useState<JummahTime | null>(null);
   const [prayerNotificationSettings, setPrayerNotificationSettings] =
     useState<PrayerNotificationSettings>(DEFAULT_PRAYER_NOTIFICATION_SETTINGS);
+  const [locationSettings, setLocationSettings] = useState<LocationSettings>(
+    loadLocationSettings()
+  );
   const [isLoading, setIsLoading] = useState(true);
   const [notificationPermission, setNotificationPermission] =
     useState<string>("unknown");
@@ -309,6 +320,54 @@ export default function Settings() {
     },
     [prayerNotificationSettings, updatePrayerNotificationSettings],
   );
+
+  // Update location settings
+  const updateLocationSettings = useCallback((newSettings: LocationSettings) => {
+    setLocationSettings(newSettings);
+    saveLocationSettings(newSettings);
+    Alert.alert(
+      "Location Updated",
+      "Prayer times will be updated based on your new location. Please restart the app or refresh prayer times to see the changes.",
+    );
+  }, []);
+
+  // Handle country selection
+  const handleCountryChange = useCallback(() => {
+    const countries = getPopularCountries();
+    Alert.alert(
+      "Select Country",
+      "Choose your country for prayer times calculation",
+      countries.map((country) => ({
+        text: country,
+        onPress: () => {
+          updateLocationSettings({
+            ...locationSettings,
+            country,
+          });
+        },
+      })).concat([{ text: "Cancel", style: "cancel" }]),
+      { cancelable: true }
+    );
+  }, [locationSettings, updateLocationSettings]);
+
+  // Handle calculation method selection
+  const handleCalculationMethodChange = useCallback(() => {
+    const methods = getAvailableCalculationMethods();
+    Alert.alert(
+      "Calculation Method",
+      "Choose the calculation method for prayer times. Different methods may be more accurate for different regions.",
+      methods.map((method) => ({
+        text: method.label,
+        onPress: () => {
+          updateLocationSettings({
+            ...locationSettings,
+            calculationMethod: method.value,
+          });
+        },
+      })).concat([{ text: "Cancel", style: "cancel" }]),
+      { cancelable: true }
+    );
+  }, [locationSettings, updateLocationSettings]);
 
   // Cleanup timeout on unmount
   useEffect(() => {
@@ -646,6 +705,127 @@ export default function Settings() {
                     </MotiView>
                   )}
                 </View>
+              </MotiView>
+            </MotiView>
+
+            {/* Location Settings Section */}
+            <MotiView
+              from={{ opacity: 0, translateY: -20, scale: 0.95 }}
+              animate={{ opacity: 1, translateY: 0, scale: 1 }}
+              transition={{ type: "spring", damping: 15, stiffness: 150 }}
+              delay={150}
+              className="w-full mb-6"
+            >
+              <Text className="text-[#4A4A4A] text-lg font-lato-bold mb-4 uppercase tracking-wide">
+                Prayer Time Location
+              </Text>
+
+              {/* Country Selection */}
+              <MotiView
+                from={{ opacity: 0, translateY: 20 }}
+                animate={{ opacity: 1, translateY: 0 }}
+                transition={{ type: "spring", damping: 15, stiffness: 150 }}
+                delay={175}
+                className="w-full mb-3"
+              >
+                <TouchableOpacity
+                  onPress={handleCountryChange}
+                  activeOpacity={0.7}
+                >
+                  <View className="w-full bg-white/70 rounded-2xl p-4 shadow-md border border-white/30">
+                    <View className="flex-row items-center justify-between">
+                      <View className="flex-row items-center flex-1">
+                        <View className="w-10 h-10 bg-white/50 rounded-full items-center justify-center mr-3">
+                          <Ionicons name="globe" size={20} color="#5B4B94" />
+                        </View>
+                        <View className="flex-1">
+                          <Text className="text-base font-lato-bold text-[#4A4A4A]">
+                            Country
+                          </Text>
+                          <Text className="text-sm font-lato text-[#6B7280] mt-1">
+                            {locationSettings.country}
+                          </Text>
+                        </View>
+                      </View>
+                      <Ionicons
+                        name="chevron-forward"
+                        size={20}
+                        color="#5B4B94"
+                      />
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              </MotiView>
+
+              {/* City Input */}
+              <MotiView
+                from={{ opacity: 0, translateY: 20 }}
+                animate={{ opacity: 1, translateY: 0 }}
+                transition={{ type: "spring", damping: 15, stiffness: 150 }}
+                delay={200}
+                className="w-full mb-3"
+              >
+                <View className="w-full bg-white/70 rounded-2xl p-4 shadow-md border border-white/30">
+                  <View className="flex-row items-center">
+                    <View className="w-10 h-10 bg-white/50 rounded-full items-center justify-center mr-3">
+                      <Ionicons name="location" size={20} color="#5B4B94" />
+                    </View>
+                    <View className="flex-1">
+                      <Text className="text-base font-lato-bold text-[#4A4A4A] mb-2">
+                        City
+                      </Text>
+                      <TextInput
+                        value={locationSettings.city}
+                        onChangeText={(text) =>
+                          updateLocationSettings({
+                            ...locationSettings,
+                            city: text,
+                          })
+                        }
+                        placeholder="Enter your city"
+                        placeholderTextColor="#9CA3AF"
+                        className="text-sm font-lato text-[#4A4A4A] bg-white/50 rounded-lg p-2 border border-white/50"
+                      />
+                    </View>
+                  </View>
+                </View>
+              </MotiView>
+
+              {/* Calculation Method */}
+              <MotiView
+                from={{ opacity: 0, translateY: 20 }}
+                animate={{ opacity: 1, translateY: 0 }}
+                transition={{ type: "spring", damping: 15, stiffness: 150 }}
+                delay={225}
+                className="w-full"
+              >
+                <TouchableOpacity
+                  onPress={handleCalculationMethodChange}
+                  activeOpacity={0.7}
+                >
+                  <View className="w-full bg-white/70 rounded-2xl p-4 shadow-md border border-white/30">
+                    <View className="flex-row items-center justify-between">
+                      <View className="flex-row items-center flex-1">
+                        <View className="w-10 h-10 bg-white/50 rounded-full items-center justify-center mr-3">
+                          <Ionicons name="calculator" size={20} color="#5B4B94" />
+                        </View>
+                        <View className="flex-1">
+                          <Text className="text-base font-lato-bold text-[#4A4A4A]">
+                            Calculation Method
+                          </Text>
+                          <Text className="text-sm font-lato text-[#6B7280] mt-1" numberOfLines={1}>
+                            {getCalculationMethodName(locationSettings.calculationMethod)}
+                          </Text>
+                        </View>
+                      </View>
+                      <Ionicons
+                        name="chevron-forward"
+                        size={20}
+                        color="#5B4B94"
+                      />
+                    </View>
+                  </View>
+                </TouchableOpacity>
               </MotiView>
             </MotiView>
 
