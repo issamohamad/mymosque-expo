@@ -21,6 +21,13 @@ export type MosqueInfo = {
   last_event: string | null;
   last_prayer: string | null;
   contact_info: ContactInfo[];
+  location_settings?: LocationSettings;
+};
+
+export type LocationSettings = {
+  city?: string;
+  country?: string;
+  calculationMethod?: number; // Aladhan API calculation method (default: 3 - Muslim World League)
 };
 
 export type ContactInfo = {

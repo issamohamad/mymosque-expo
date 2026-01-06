@@ -10,7 +10,7 @@ import {
   savePrayerNotificationSettings,
   schedulePrayerNotifications,
 } from "@/lib/prayerNotifications";
-import { JummahTime, MosqueInfo } from "@/lib/types";
+import { JummahTime, LocationSettings, MosqueInfo } from "@/lib/types";
 import { fetchMosqueInfo } from "@/lib/utils";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -64,6 +64,12 @@ export default function Settings() {
     useState<string>("unknown");
   const [devPassword, setDevPassword] = useState("");
   const [showDevInput, setShowDevInput] = useState(false);
+  const [locationSettings, setLocationSettings] = useState<LocationSettings>({
+    city: "",
+    country: "Sweden",
+    calculationMethod: 3,
+  });
+  const [showLocationInput, setShowLocationInput] = useState(false);
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const prayerNotificationTimeoutRef = useRef<ReturnType<
     typeof setTimeout
@@ -140,6 +146,15 @@ export default function Settings() {
           setMosqueInfo(mosqueData.info);
           setMosqueId(mosqueData.info.uid);
           setJummahTimes(mosqueData.jummahTimes || null);
+          
+          // Load location settings from mosque info
+          if (mosqueData.info.location_settings) {
+            setLocationSettings({
+              city: mosqueData.info.location_settings.city || "",
+              country: mosqueData.info.location_settings.country || "Sweden",
+              calculationMethod: mosqueData.info.location_settings.calculationMethod || 3,
+            });
+          }
         }
       } catch (error) {
         console.error("Error loading settings:", error);
@@ -150,6 +165,58 @@ export default function Settings() {
 
     loadData();
   }, []);
+
+  // Save location settings
+  const saveLocationSettings = useCallback(async () => {
+    try {
+      if (!mosqueInfo) return;
+      
+      // Validate inputs
+      const trimmedCity = locationSettings.city?.trim() || "";
+      const trimmedCountry = locationSettings.country?.trim() || "Sweden";
+      
+      if (!trimmedCity) {
+        Alert.alert("Validation Error", "City cannot be empty");
+        return;
+      }
+      
+      if (!trimmedCountry) {
+        Alert.alert("Validation Error", "Country cannot be empty");
+        return;
+      }
+      
+      // Update mosque info with new location settings
+      const updatedMosqueInfo: MosqueInfo = {
+        ...mosqueInfo,
+        location_settings: {
+          city: trimmedCity,
+          country: trimmedCountry,
+          calculationMethod: locationSettings.calculationMethod || 3,
+        },
+      };
+      
+      setMosqueInfo(updatedMosqueInfo);
+      setShowLocationInput(false);
+      
+      // Save to local storage
+      const mosqueData = await fetchMosqueInfo();
+      if (mosqueData) {
+        const updatedMosqueData = {
+          ...mosqueData,
+          info: updatedMosqueInfo,
+        };
+        
+        // Save to MMKV storage
+        const { storage } = await import("@/lib/mmkv");
+        storage.set(`mosqueData-${mosqueInfo.uid}`, JSON.stringify(updatedMosqueData));
+      }
+      
+      Alert.alert("Success", "Location settings updated successfully!");
+    } catch (error) {
+      console.error("Error saving location settings:", error);
+      Alert.alert("Error", "Failed to save location settings");
+    }
+  }, [locationSettings, mosqueInfo]);
 
   // Debounced save settings to AsyncStorage
   const debouncedSaveSettings = useCallback(
@@ -643,6 +710,150 @@ export default function Settings() {
                           )}
                         </>
                       )}
+                    </MotiView>
+                  )}
+                </View>
+              </MotiView>
+            </MotiView>
+
+            {/* Prayer Time Location Settings Section */}
+            <MotiView
+              from={{ opacity: 0, translateY: -20, scale: 0.95 }}
+              animate={{ opacity: 1, translateY: 0, scale: 1 }}
+              transition={{ type: "spring", damping: 15, stiffness: 150 }}
+              delay={250}
+              className="w-full mb-6"
+            >
+              <Text className="text-[#4A4A4A] text-lg font-lato-bold mb-4 uppercase tracking-wide">
+                Prayer Time Location
+              </Text>
+
+              <MotiView
+                from={{ opacity: 0, translateY: 20 }}
+                animate={{ opacity: 1, translateY: 0 }}
+                transition={{ type: "spring", damping: 15, stiffness: 150 }}
+                delay={300}
+                className="w-full mb-3"
+              >
+                <View className="w-full bg-white/70 rounded-2xl p-4 shadow-md border border-white/30">
+                  <View className="flex-row items-center justify-between mb-3">
+                    <View className="flex-row items-center flex-1">
+                      <View className="w-10 h-10 bg-white/50 rounded-full items-center justify-center mr-3">
+                        <Ionicons name="location" size={20} color="#5B4B94" />
+                      </View>
+                      <View className="flex-1">
+                        <Text className="text-base font-lato-bold text-[#4A4A4A]">
+                          Location Settings
+                        </Text>
+                        <Text className="text-xs font-lato text-[#6B7280] mt-0.5">
+                          Configure city and country for prayer times
+                        </Text>
+                      </View>
+                    </View>
+                    <TouchableOpacity
+                      onPress={() => setShowLocationInput(!showLocationInput)}
+                      className="bg-[#5B4B94] px-4 py-2 rounded-lg"
+                    >
+                      <Text className="text-white font-lato-bold text-sm">
+                        {showLocationInput ? "Cancel" : "Edit"}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+
+                  {/* Display current settings */}
+                  {!showLocationInput && (
+                    <View className="mt-2 pt-3 border-t border-gray-200">
+                      <View className="flex-row justify-between mb-2">
+                        <Text className="text-sm font-lato text-[#6B7280]">City:</Text>
+                        <Text className="text-sm font-lato-bold text-[#4A4A4A]">
+                          {locationSettings.city || "Not set"}
+                        </Text>
+                      </View>
+                      <View className="flex-row justify-between mb-2">
+                        <Text className="text-sm font-lato text-[#6B7280]">Country:</Text>
+                        <Text className="text-sm font-lato-bold text-[#4A4A4A]">
+                          {locationSettings.country || "Sweden"}
+                        </Text>
+                      </View>
+                      <View className="flex-row justify-between">
+                        <Text className="text-sm font-lato text-[#6B7280]">Method:</Text>
+                        <Text className="text-sm font-lato-bold text-[#4A4A4A]">
+                          {locationSettings.calculationMethod === 3 ? "Muslim World League" : `Method ${locationSettings.calculationMethod}`}
+                        </Text>
+                      </View>
+                    </View>
+                  )}
+
+                  {/* Edit form */}
+                  {showLocationInput && (
+                    <MotiView
+                      from={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      transition={{ type: "spring", damping: 15, stiffness: 150 }}
+                      className="mt-3"
+                    >
+                      <View className="space-y-3">
+                        <View>
+                          <Text className="text-sm font-lato-bold text-[#4A4A4A] mb-2">
+                            City
+                          </Text>
+                          <TextInput
+                            value={locationSettings.city}
+                            onChangeText={(text) =>
+                              setLocationSettings({ ...locationSettings, city: text })
+                            }
+                            placeholder="e.g., Stockholm"
+                            className="bg-white/50 rounded-lg px-3 py-2 text-[#4A4A4A] font-lato"
+                            placeholderTextColor="#6B7280"
+                          />
+                        </View>
+
+                        <View>
+                          <Text className="text-sm font-lato-bold text-[#4A4A4A] mb-2 mt-3">
+                            Country
+                          </Text>
+                          <TextInput
+                            value={locationSettings.country}
+                            onChangeText={(text) =>
+                              setLocationSettings({ ...locationSettings, country: text })
+                            }
+                            placeholder="e.g., Sweden"
+                            className="bg-white/50 rounded-lg px-3 py-2 text-[#4A4A4A] font-lato"
+                            placeholderTextColor="#6B7280"
+                          />
+                        </View>
+
+                        <View>
+                          <Text className="text-sm font-lato-bold text-[#4A4A4A] mb-2 mt-3">
+                            Calculation Method
+                          </Text>
+                          <Text className="text-xs font-lato text-[#6B7280] mb-2">
+                            Muslim World League (Method 3) is recommended for high-latitude regions like Sweden
+                          </Text>
+                          <TextInput
+                            value={String(locationSettings.calculationMethod || 3)}
+                            onChangeText={(text) =>
+                              setLocationSettings({ 
+                                ...locationSettings, 
+                                calculationMethod: parseInt(text) || 3 
+                              })
+                            }
+                            keyboardType="number-pad"
+                            placeholder="3"
+                            className="bg-white/50 rounded-lg px-3 py-2 text-[#4A4A4A] font-lato"
+                            placeholderTextColor="#6B7280"
+                          />
+                        </View>
+
+                        <TouchableOpacity
+                          onPress={saveLocationSettings}
+                          className="bg-[#88AE79] rounded-lg py-3 mt-4"
+                        >
+                          <Text className="text-white font-lato-bold text-center">
+                            Save Location Settings
+                          </Text>
+                        </TouchableOpacity>
+                      </View>
                     </MotiView>
                   )}
                 </View>
