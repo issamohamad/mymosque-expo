@@ -11,6 +11,7 @@ import {
   schedulePrayerNotifications,
 } from "@/lib/prayerNotifications";
 import { JummahTime, LocationSettings, MosqueInfo } from "@/lib/types";
+import { getMethodById } from "@/lib/prayerCalculationMethods";
 import { fetchMosqueInfo } from "@/lib/utils";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -828,21 +829,16 @@ export default function Settings() {
                             Calculation Method
                           </Text>
                           <Text className="text-xs font-lato text-[#6B7280] mb-2">
-                            Muslim World League (Method 3) is recommended for high-latitude regions like Sweden
+                            {getMethodById(locationSettings.calculationMethod || 3)?.name || "Muslim World League"} is recommended for high-latitude regions like Sweden
                           </Text>
-                          <TextInput
-                            value={String(locationSettings.calculationMethod || 3)}
-                            onChangeText={(text) =>
-                              setLocationSettings({ 
-                                ...locationSettings, 
-                                calculationMethod: parseInt(text) || 3 
-                              })
-                            }
-                            keyboardType="number-pad"
-                            placeholder="3"
-                            className="bg-white/50 rounded-lg px-3 py-2 text-[#4A4A4A] font-lato"
-                            placeholderTextColor="#6B7280"
-                          />
+                          <View className="bg-white/50 rounded-lg px-3 py-2">
+                            <Text className="text-sm font-lato text-[#4A4A4A]">
+                              Method {locationSettings.calculationMethod || 3} - {getMethodById(locationSettings.calculationMethod || 3)?.name || "Muslim World League"}
+                            </Text>
+                          </View>
+                          <Text className="text-xs font-lato text-[#88AE79] mt-2">
+                            Recommended methods for Sweden: Muslim World League (3), ISNA (2), France (12), Russia (14)
+                          </Text>
                         </View>
 
                         <TouchableOpacity

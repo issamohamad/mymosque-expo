@@ -30,7 +30,8 @@ export const getPrayerTimes = async (
     .single();
 
   try {
-    const prayerTimes = await getLocationPrayerTimes(city, undefined, country); // prayer times from the api
+    const prayerTimesResult = await getLocationPrayerTimes(city, undefined, country); // prayer times from the api
+    const prayerTimes = prayerTimesResult.timings;
     for (let key in prayerTimes) {
       // key is the prayer name
       const formattedAdhan = to12HourFormat(
