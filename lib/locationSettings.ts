@@ -60,7 +60,7 @@ export const getCalculationMethodName = (method: number): string => {
     9: "Kuwait",
     10: "Qatar",
     11: "Majlis Ugama Islam Singapura, Singapore",
-    12: "Union Organization islamic de France",
+    12: "Union Organization Islamic de France",
     13: "Diyanet İşleri Başkanlığı, Turkey",
     14: "Spiritual Administration of Muslims of Russia",
   };
@@ -86,7 +86,7 @@ export const getAvailableCalculationMethods = (): Array<{
     { value: 9, label: "Kuwait" },
     { value: 10, label: "Qatar" },
     { value: 11, label: "Majlis Ugama Islam Singapura, Singapore" },
-    { value: 12, label: "Union Organization islamic de France" },
+    { value: 12, label: "Union Organization Islamic de France" },
     { value: 13, label: "Diyanet İşleri Başkanlığı, Turkey" },
     { value: 14, label: "Spiritual Administration of Muslims of Russia" },
   ];
