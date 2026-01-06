@@ -7,11 +7,13 @@ import { PrayerTime } from "./types";
  * gets prayer times for a given mosque
  * @param city - the city to get prayer times for
  * @param lastVisitedMosqueId - the id of the mosque to get prayer times for
+ * @param country - the country to get prayer times for (defaults to Sweden)
  * @returns the prayer times for the given mosque in the right format
  */
 export const getPrayerTimes = async (
   city: string,
   lastVisitedMosqueId: string,
+  country: string = "Sweden",
 ) => {
   const today = new Date();
   const year = today.getUTCFullYear();
@@ -28,7 +30,12 @@ export const getPrayerTimes = async (
     .single();
 
   try {
-    const prayerTimes = await getLocationPrayerTimes(city); // prayer times from the api
+    const prayerTimesResult = await getLocationPrayerTimes(
+      city,
+      undefined,
+      country,
+    ); // prayer times from the api
+    const prayerTimes = prayerTimesResult.timings;
     for (let key in prayerTimes) {
       // key is the prayer name
       const formattedAdhan = to12HourFormat(

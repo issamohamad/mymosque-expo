@@ -25,6 +25,9 @@ My Mosque is a platform that helps connect masjid to their communities by provid
 - 📢 **Real-time Announcements**: Receive instant notifications about important mosque announcements, community updates, and urgent messages
 - 📅 **Event Management**: Stay informed about upcoming events, programs, lectures, and community gatherings at your connected masjids
 - 🕐 **Prayer Times**: Access accurate, location-based prayer times for your local masjids with automatic updates
+  - 🌍 **International Support**: Configure prayer times for any city and country, including high-latitude regions like Sweden
+  - 🧭 **Calculation Methods**: Support for multiple Islamic prayer time calculation methods suitable for different regions
+  - ⚠️ **High-Latitude Adjustments**: Automatic warnings and special calculations for locations above 60° latitude
 - 🔔 **Push Notifications**: Get real-time alerts for announcements, event reminders, and prayer time notifications to never miss important updates
 - 📱 **User-friendly Interface**: Clean, intuitive design that makes it easy to navigate between different masjids and their content
 - 🌐 **Community Connection**: Bridge the gap between masjid administration and community members through seamless digital communication
@@ -130,3 +133,21 @@ mymosque/
 ├── types/             # TypeScript type definitions
 └── lib/               # Utility modules and helper functions that provide reusable logic
 ```
+
+## Prayer Times for Sweden and High-Latitude Regions
+
+MyMosque now supports configurable prayer time calculations for Sweden and other high-latitude regions. This feature includes:
+
+- **Dynamic Location Configuration**: Set your city and country in the Settings page
+- **High-Latitude Support**: Automatic detection and adjustments for locations above 60° latitude
+- **Multiple Calculation Methods**: Support for various Islamic calculation methods, with Muslim World League (Method 3) recommended for Sweden
+- **Validation**: Input validation to ensure correct API queries
+
+For detailed testing instructions and information about high-latitude prayer times, see [docs/TESTING_PRAYER_TIMES_SWEDEN.md](docs/TESTING_PRAYER_TIMES_SWEDEN.md).
+
+### Recommended Cities for Testing
+
+- **Stockholm** (59.3°N) - Moderate latitude
+- **Kiruna** (67.8°N) - Above Arctic Circle, requires special adjustments
+- **Gothenburg** (57.7°N) - West coast
+- **Malmö** (55.6°N) - Southern Sweden
