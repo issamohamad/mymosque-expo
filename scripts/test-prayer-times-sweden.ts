@@ -8,6 +8,7 @@
  */
 
 import getLocationPrayerTimes from "../lib/getLocationPrayerTimes";
+import { DEFAULT_SWEDEN_METHOD_ID } from "../lib/prayerCalculationMethods";
 
 async function testSwedishCities() {
   console.log("=== Testing Prayer Times for Swedish Cities ===\n");
@@ -48,7 +49,7 @@ async function testSwedishCities() {
         testCase.city,
         new Date(),
         testCase.country,
-        3, // Muslim World League method
+        DEFAULT_SWEDEN_METHOD_ID,
       );
 
       console.log("✅ Success!");

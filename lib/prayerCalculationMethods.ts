@@ -136,11 +136,30 @@ export function getMethodById(id: number): CalculationMethod | undefined {
 }
 
 /**
+ * Default calculation method ID for Sweden (Muslim World League)
+ */
+export const DEFAULT_SWEDEN_METHOD_ID = 3;
+
+/**
  * Get the default method for Sweden
  * Returns Muslim World League (Method 3) which is recommended for high-latitude regions
  */
 export function getSwedishDefaultMethod(): CalculationMethod {
-  return CALCULATION_METHODS.find((method) => method.id === 3)!;
+  const method = CALCULATION_METHODS.find((method) => method.id === 3);
+  if (!method) {
+    // Fallback to first high-latitude supporting method if Method 3 is somehow missing
+    return (
+      getHighLatitudeMethods()[0] || {
+        id: 3,
+        name: "Muslim World League",
+        description:
+          "Recommended for Europe and high-latitude regions. Uses angle-based calculations suitable for areas with extreme day/night variations.",
+        suitableFor: ["Europe", "Sweden", "High Latitudes"],
+        highLatitudeSupport: true,
+      }
+    );
+  }
+  return method;
 }
 
 /**
@@ -169,6 +188,6 @@ export const HIGH_LATITUDE_INFO = {
   arcticCircle: 66.5,
   stockholmLatitude: 59.3,
   kirunaLatitude: 67.8,
-  recommendedMethod: 3, // Muslim World League
+  recommendedMethod: DEFAULT_SWEDEN_METHOD_ID,
   alternativeMethods: [2, 12, 14], // ISNA, France, Russia
 };

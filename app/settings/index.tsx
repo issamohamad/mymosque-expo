@@ -11,7 +11,10 @@ import {
   schedulePrayerNotifications,
 } from "@/lib/prayerNotifications";
 import { JummahTime, LocationSettings, MosqueInfo } from "@/lib/types";
-import { getMethodById } from "@/lib/prayerCalculationMethods";
+import {
+  getMethodById,
+  DEFAULT_SWEDEN_METHOD_ID,
+} from "@/lib/prayerCalculationMethods";
 import { fetchMosqueInfo } from "@/lib/utils";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -68,7 +71,7 @@ export default function Settings() {
   const [locationSettings, setLocationSettings] = useState<LocationSettings>({
     city: "",
     country: "Sweden",
-    calculationMethod: 3,
+    calculationMethod: DEFAULT_SWEDEN_METHOD_ID,
   });
   const [showLocationInput, setShowLocationInput] = useState(false);
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -154,7 +157,8 @@ export default function Settings() {
               city: mosqueData.info.location_settings.city || "",
               country: mosqueData.info.location_settings.country || "Sweden",
               calculationMethod:
-                mosqueData.info.location_settings.calculationMethod || 3,
+                mosqueData.info.location_settings.calculationMethod ||
+                DEFAULT_SWEDEN_METHOD_ID,
             });
           }
         }
@@ -193,7 +197,8 @@ export default function Settings() {
         location_settings: {
           city: trimmedCity,
           country: trimmedCountry,
-          calculationMethod: locationSettings.calculationMethod || 3,
+          calculationMethod:
+            locationSettings.calculationMethod || DEFAULT_SWEDEN_METHOD_ID,
         },
       };
 
@@ -789,9 +794,11 @@ export default function Settings() {
                           Method:
                         </Text>
                         <Text className="text-sm font-lato-bold text-[#4A4A4A]">
-                          {locationSettings.calculationMethod === 3
-                            ? "Muslim World League"
-                            : `Method ${locationSettings.calculationMethod}`}
+                          {getMethodById(
+                            locationSettings.calculationMethod ||
+                              DEFAULT_SWEDEN_METHOD_ID,
+                          )?.name ||
+                            `Method ${locationSettings.calculationMethod}`}
                         </Text>
                       </View>
                     </View>
@@ -852,15 +859,20 @@ export default function Settings() {
                           </Text>
                           <Text className="text-xs font-lato text-[#6B7280] mb-2">
                             {getMethodById(
-                              locationSettings.calculationMethod || 3,
+                              locationSettings.calculationMethod ||
+                                DEFAULT_SWEDEN_METHOD_ID,
                             )?.name || "Muslim World League"}{" "}
                             is recommended for high-latitude regions like Sweden
                           </Text>
                           <View className="bg-white/50 rounded-lg px-3 py-2">
                             <Text className="text-sm font-lato text-[#4A4A4A]">
-                              Method {locationSettings.calculationMethod || 3} -{" "}
+                              Method{" "}
+                              {locationSettings.calculationMethod ||
+                                DEFAULT_SWEDEN_METHOD_ID}{" "}
+                              -{" "}
                               {getMethodById(
-                                locationSettings.calculationMethod || 3,
+                                locationSettings.calculationMethod ||
+                                  DEFAULT_SWEDEN_METHOD_ID,
                               )?.name || "Muslim World League"}
                             </Text>
                           </View>
