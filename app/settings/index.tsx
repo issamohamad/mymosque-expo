@@ -205,20 +205,27 @@ export default function Settings() {
       setMosqueInfo(updatedMosqueInfo);
       setShowLocationInput(false);
 
-      // Save to local storage
-      const mosqueData = await fetchMosqueInfo();
-      if (mosqueData) {
-        const updatedMosqueData = {
-          ...mosqueData,
-          info: updatedMosqueInfo,
-        };
-
-        // Save to MMKV storage
+      // Save to local storage - preserve existing mosque data
+      try {
         const { storage } = await import("@/lib/mmkv");
-        storage.set(
+        const existingDataString = storage.getString(
           `mosqueData-${mosqueInfo.uid}`,
-          JSON.stringify(updatedMosqueData),
         );
+
+        if (existingDataString) {
+          const existingData = JSON.parse(existingDataString);
+          const updatedMosqueData = {
+            ...existingData,
+            info: updatedMosqueInfo,
+          };
+          storage.set(
+            `mosqueData-${mosqueInfo.uid}`,
+            JSON.stringify(updatedMosqueData),
+          );
+        }
+      } catch (storageError) {
+        console.error("Error saving to storage:", storageError);
+        // Continue even if storage fails - UI state is already updated
       }
 
       Alert.alert("Success", "Location settings updated successfully!");

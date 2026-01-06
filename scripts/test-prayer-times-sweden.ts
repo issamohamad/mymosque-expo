@@ -4,7 +4,11 @@
  * This script tests the getLocationPrayerTimes function with Swedish cities
  * to ensure correct prayer times and high-latitude adjustments.
  *
- * To run: npx tsx scripts/test-prayer-times-sweden.ts
+ * Prerequisites:
+ *   npm install -g tsx
+ *
+ * To run:
+ *   npx tsx scripts/test-prayer-times-sweden.ts
  */
 
 import getLocationPrayerTimes from "../lib/getLocationPrayerTimes";

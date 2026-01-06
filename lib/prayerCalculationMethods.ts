@@ -145,7 +145,9 @@ export const DEFAULT_SWEDEN_METHOD_ID = 3;
  * Returns Muslim World League (Method 3) which is recommended for high-latitude regions
  */
 export function getSwedishDefaultMethod(): CalculationMethod {
-  const method = CALCULATION_METHODS.find((method) => method.id === 3);
+  const method = CALCULATION_METHODS.find(
+    (method) => method.id === DEFAULT_SWEDEN_METHOD_ID,
+  );
   if (!method) {
     // Fallback to first high-latitude supporting method if Method 3 is somehow missing
     return (

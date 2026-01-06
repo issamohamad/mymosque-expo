@@ -1,8 +1,25 @@
 /**
+ * Prayer timings interface for Aladhan API response
+ */
+export type PrayerTimings = {
+  Fajr: string;
+  Sunrise: string;
+  Dhuhr: string;
+  Asr: string;
+  Sunset: string;
+  Maghrib: string;
+  Isha: string;
+  Imsak: string;
+  Midnight: string;
+  Firstthird: string;
+  Lastthird: string;
+};
+
+/**
  * Result type for prayer times with metadata
  */
 export type PrayerTimesResult = {
-  timings: any;
+  timings: PrayerTimings;
   warning?: string;
   latitude?: number;
   method?: number;
@@ -40,7 +57,9 @@ export default async function getLocationPrayerTimes(
   const response = await fetch(url);
 
   if (!response.ok) {
-    console.log(response);
+    console.error(
+      `Failed to fetch prayer times for ${city}, ${country}: ${response.statusText}`,
+    );
     throw new Error("Failed to fetch prayer times", {
       cause: response.statusText,
     });
