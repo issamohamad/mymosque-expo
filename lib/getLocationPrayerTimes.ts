@@ -26,7 +26,7 @@ export default async function getLocationPrayerTimes(
   if (!city || city.trim() === "") {
     throw new Error("City parameter is required and cannot be empty");
   }
-  
+
   if (!country || country.trim() === "") {
     throw new Error("Country parameter is required and cannot be empty");
   }
@@ -35,7 +35,7 @@ export default async function getLocationPrayerTimes(
   // URL encode city and country to handle special characters
   const encodedCity = encodeURIComponent(city.trim());
   const encodedCountry = encodeURIComponent(country.trim());
-  
+
   const url = `https://api.aladhan.com/v1/timingsByCity/${targetDate.getDate()}-${targetDate.getMonth() + 1}-${targetDate.getFullYear()}?city=${encodedCity}&country=${encodedCountry}&method=${method}`;
   const response = await fetch(url);
 
@@ -47,24 +47,26 @@ export default async function getLocationPrayerTimes(
   }
 
   const data = await response.json();
-  
+
   // Check for high-latitude warnings
   let warning: string | undefined;
   const latitude = data.data?.meta?.latitude;
-  
+
   // High latitude regions (above 60° or below -60°) may have prayer time calculation challenges
   if (latitude !== undefined) {
     const absLatitude = Math.abs(latitude);
-    
+
     if (absLatitude > 66.5) {
       // Arctic/Antarctic Circle - extreme high latitude
-      warning = "Prayer times in extreme high-latitude regions may require special adjustments. Using Muslim World League method with midnight/1/7th rule for Fajr and Isha.";
+      warning =
+        "Prayer times in extreme high-latitude regions may require special adjustments. Using Muslim World League method with midnight/1/7th rule for Fajr and Isha.";
     } else if (absLatitude > 60) {
       // High latitude (like much of Sweden)
-      warning = "Prayer times calculated using Muslim World League method, suitable for high-latitude regions.";
+      warning =
+        "Prayer times calculated using Muslim World League method, suitable for high-latitude regions.";
     }
   }
-  
+
   return {
     timings: data.data.timings,
     warning,

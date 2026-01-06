@@ -1,9 +1,9 @@
 /**
  * Prayer Time Calculation Methods for Aladhan API
- * 
+ *
  * This file documents the calculation methods available in the Aladhan API.
  * For high-latitude regions like Sweden, certain methods are more suitable.
- * 
+ *
  * Reference: https://aladhan.com/calculation-methods
  */
 
@@ -29,7 +29,8 @@ export const CALCULATION_METHODS: CalculationMethod[] = [
   {
     id: 1,
     name: "University of Islamic Sciences, Karachi",
-    description: "Used in Pakistan, Bangladesh, India, Afghanistan, and parts of Europe",
+    description:
+      "Used in Pakistan, Bangladesh, India, Afghanistan, and parts of Europe",
     suitableFor: ["South Asia"],
     highLatitudeSupport: false,
   },
@@ -43,7 +44,8 @@ export const CALCULATION_METHODS: CalculationMethod[] = [
   {
     id: 3,
     name: "Muslim World League",
-    description: "Recommended for Europe and high-latitude regions. Uses angle-based calculations suitable for areas with extreme day/night variations.",
+    description:
+      "Recommended for Europe and high-latitude regions. Uses angle-based calculations suitable for areas with extreme day/night variations.",
     suitableFor: ["Europe", "Sweden", "High Latitudes"],
     highLatitudeSupport: true,
   },
@@ -123,14 +125,14 @@ export const CALCULATION_METHODS: CalculationMethod[] = [
  * Get recommended calculation methods for high-latitude regions
  */
 export function getHighLatitudeMethods(): CalculationMethod[] {
-  return CALCULATION_METHODS.filter(method => method.highLatitudeSupport);
+  return CALCULATION_METHODS.filter((method) => method.highLatitudeSupport);
 }
 
 /**
  * Get calculation method by ID
  */
 export function getMethodById(id: number): CalculationMethod | undefined {
-  return CALCULATION_METHODS.find(method => method.id === id);
+  return CALCULATION_METHODS.find((method) => method.id === id);
 }
 
 /**
@@ -138,25 +140,25 @@ export function getMethodById(id: number): CalculationMethod | undefined {
  * Returns Muslim World League (Method 3) which is recommended for high-latitude regions
  */
 export function getSwedishDefaultMethod(): CalculationMethod {
-  return CALCULATION_METHODS.find(method => method.id === 3)!;
+  return CALCULATION_METHODS.find((method) => method.id === 3)!;
 }
 
 /**
  * High-Latitude Adjustment Information
- * 
+ *
  * For locations above 60° latitude (most of Sweden, including Stockholm at 59.3°N),
  * prayer time calculations require special consideration, especially during summer
  * when twilight may last all night.
- * 
+ *
  * The Aladhan API handles this using different methods:
  * 1. Middle of the Night Method (for Isha)
  * 2. One-Seventh of the Night Method (for Isha)
  * 3. Angle-based Method (recommended - used by Muslim World League)
- * 
+ *
  * For extreme locations like Kiruna (67.8°N), during polar day/night periods,
  * scholars recommend following the times of the nearest location where day and
  * night can be distinguished (e.g., Stockholm or Mecca).
- * 
+ *
  * The Muslim World League method (Method 3) is recommended for Sweden as it:
  * - Uses appropriate angles for Fajr (18°) and Isha (17°)
  * - Has built-in high-latitude adjustments

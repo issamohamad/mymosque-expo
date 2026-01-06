@@ -147,13 +147,14 @@ export default function Settings() {
           setMosqueInfo(mosqueData.info);
           setMosqueId(mosqueData.info.uid);
           setJummahTimes(mosqueData.jummahTimes || null);
-          
+
           // Load location settings from mosque info
           if (mosqueData.info.location_settings) {
             setLocationSettings({
               city: mosqueData.info.location_settings.city || "",
               country: mosqueData.info.location_settings.country || "Sweden",
-              calculationMethod: mosqueData.info.location_settings.calculationMethod || 3,
+              calculationMethod:
+                mosqueData.info.location_settings.calculationMethod || 3,
             });
           }
         }
@@ -171,21 +172,21 @@ export default function Settings() {
   const saveLocationSettings = useCallback(async () => {
     try {
       if (!mosqueInfo) return;
-      
+
       // Validate inputs
       const trimmedCity = locationSettings.city?.trim() || "";
       const trimmedCountry = locationSettings.country?.trim() || "Sweden";
-      
+
       if (!trimmedCity) {
         Alert.alert("Validation Error", "City cannot be empty");
         return;
       }
-      
+
       if (!trimmedCountry) {
         Alert.alert("Validation Error", "Country cannot be empty");
         return;
       }
-      
+
       // Update mosque info with new location settings
       const updatedMosqueInfo: MosqueInfo = {
         ...mosqueInfo,
@@ -195,10 +196,10 @@ export default function Settings() {
           calculationMethod: locationSettings.calculationMethod || 3,
         },
       };
-      
+
       setMosqueInfo(updatedMosqueInfo);
       setShowLocationInput(false);
-      
+
       // Save to local storage
       const mosqueData = await fetchMosqueInfo();
       if (mosqueData) {
@@ -206,12 +207,15 @@ export default function Settings() {
           ...mosqueData,
           info: updatedMosqueInfo,
         };
-        
+
         // Save to MMKV storage
         const { storage } = await import("@/lib/mmkv");
-        storage.set(`mosqueData-${mosqueInfo.uid}`, JSON.stringify(updatedMosqueData));
+        storage.set(
+          `mosqueData-${mosqueInfo.uid}`,
+          JSON.stringify(updatedMosqueData),
+        );
       }
-      
+
       Alert.alert("Success", "Location settings updated successfully!");
     } catch (error) {
       console.error("Error saving location settings:", error);
@@ -765,21 +769,29 @@ export default function Settings() {
                   {!showLocationInput && (
                     <View className="mt-2 pt-3 border-t border-gray-200">
                       <View className="flex-row justify-between mb-2">
-                        <Text className="text-sm font-lato text-[#6B7280]">City:</Text>
+                        <Text className="text-sm font-lato text-[#6B7280]">
+                          City:
+                        </Text>
                         <Text className="text-sm font-lato-bold text-[#4A4A4A]">
                           {locationSettings.city || "Not set"}
                         </Text>
                       </View>
                       <View className="flex-row justify-between mb-2">
-                        <Text className="text-sm font-lato text-[#6B7280]">Country:</Text>
+                        <Text className="text-sm font-lato text-[#6B7280]">
+                          Country:
+                        </Text>
                         <Text className="text-sm font-lato-bold text-[#4A4A4A]">
                           {locationSettings.country || "Sweden"}
                         </Text>
                       </View>
                       <View className="flex-row justify-between">
-                        <Text className="text-sm font-lato text-[#6B7280]">Method:</Text>
+                        <Text className="text-sm font-lato text-[#6B7280]">
+                          Method:
+                        </Text>
                         <Text className="text-sm font-lato-bold text-[#4A4A4A]">
-                          {locationSettings.calculationMethod === 3 ? "Muslim World League" : `Method ${locationSettings.calculationMethod}`}
+                          {locationSettings.calculationMethod === 3
+                            ? "Muslim World League"
+                            : `Method ${locationSettings.calculationMethod}`}
                         </Text>
                       </View>
                     </View>
@@ -790,7 +802,11 @@ export default function Settings() {
                     <MotiView
                       from={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: "auto" }}
-                      transition={{ type: "spring", damping: 15, stiffness: 150 }}
+                      transition={{
+                        type: "spring",
+                        damping: 15,
+                        stiffness: 150,
+                      }}
                       className="mt-3"
                     >
                       <View className="space-y-3">
@@ -801,7 +817,10 @@ export default function Settings() {
                           <TextInput
                             value={locationSettings.city}
                             onChangeText={(text) =>
-                              setLocationSettings({ ...locationSettings, city: text })
+                              setLocationSettings({
+                                ...locationSettings,
+                                city: text,
+                              })
                             }
                             placeholder="e.g., Stockholm"
                             className="bg-white/50 rounded-lg px-3 py-2 text-[#4A4A4A] font-lato"
@@ -816,7 +835,10 @@ export default function Settings() {
                           <TextInput
                             value={locationSettings.country}
                             onChangeText={(text) =>
-                              setLocationSettings({ ...locationSettings, country: text })
+                              setLocationSettings({
+                                ...locationSettings,
+                                country: text,
+                              })
                             }
                             placeholder="e.g., Sweden"
                             className="bg-white/50 rounded-lg px-3 py-2 text-[#4A4A4A] font-lato"
@@ -829,15 +851,22 @@ export default function Settings() {
                             Calculation Method
                           </Text>
                           <Text className="text-xs font-lato text-[#6B7280] mb-2">
-                            {getMethodById(locationSettings.calculationMethod || 3)?.name || "Muslim World League"} is recommended for high-latitude regions like Sweden
+                            {getMethodById(
+                              locationSettings.calculationMethod || 3,
+                            )?.name || "Muslim World League"}{" "}
+                            is recommended for high-latitude regions like Sweden
                           </Text>
                           <View className="bg-white/50 rounded-lg px-3 py-2">
                             <Text className="text-sm font-lato text-[#4A4A4A]">
-                              Method {locationSettings.calculationMethod || 3} - {getMethodById(locationSettings.calculationMethod || 3)?.name || "Muslim World League"}
+                              Method {locationSettings.calculationMethod || 3} -{" "}
+                              {getMethodById(
+                                locationSettings.calculationMethod || 3,
+                              )?.name || "Muslim World League"}
                             </Text>
                           </View>
                           <Text className="text-xs font-lato text-[#88AE79] mt-2">
-                            Recommended methods for Sweden: Muslim World League (3), ISNA (2), France (12), Russia (14)
+                            Recommended methods for Sweden: Muslim World League
+                            (3), ISNA (2), France (12), Russia (14)
                           </Text>
                         </View>
 
