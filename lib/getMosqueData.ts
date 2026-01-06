@@ -34,7 +34,7 @@ export const getPrayerTimes = async (
       city,
       undefined,
       locationSettings.country,
-      locationSettings.calculationMethod
+      locationSettings.calculationMethod,
     ); // prayer times from the api
     for (let key in prayerTimes) {
       // key is the prayer name

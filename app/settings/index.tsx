@@ -68,7 +68,7 @@ export default function Settings() {
   const [prayerNotificationSettings, setPrayerNotificationSettings] =
     useState<PrayerNotificationSettings>(DEFAULT_PRAYER_NOTIFICATION_SETTINGS);
   const [locationSettings, setLocationSettings] = useState<LocationSettings>(
-    loadLocationSettings()
+    loadLocationSettings(),
   );
   const [isLoading, setIsLoading] = useState(true);
   const [notificationPermission, setNotificationPermission] =
@@ -322,14 +322,17 @@ export default function Settings() {
   );
 
   // Update location settings
-  const updateLocationSettings = useCallback((newSettings: LocationSettings) => {
-    setLocationSettings(newSettings);
-    saveLocationSettings(newSettings);
-    Alert.alert(
-      "Location Updated",
-      "Prayer times will be updated based on your new location. Please restart the app or refresh prayer times to see the changes.",
-    );
-  }, []);
+  const updateLocationSettings = useCallback(
+    (newSettings: LocationSettings) => {
+      setLocationSettings(newSettings);
+      saveLocationSettings(newSettings);
+      Alert.alert(
+        "Location Updated",
+        "Prayer times will be updated based on your new location. Please restart the app or refresh prayer times to see the changes.",
+      );
+    },
+    [],
+  );
 
   // Handle country selection
   const handleCountryChange = useCallback(() => {
@@ -337,16 +340,18 @@ export default function Settings() {
     Alert.alert(
       "Select Country",
       "Choose your country for prayer times calculation",
-      countries.map((country) => ({
-        text: country,
-        onPress: () => {
-          updateLocationSettings({
-            ...locationSettings,
-            country,
-          });
-        },
-      })).concat([{ text: "Cancel", style: "cancel" }]),
-      { cancelable: true }
+      countries
+        .map((country) => ({
+          text: country,
+          onPress: () => {
+            updateLocationSettings({
+              ...locationSettings,
+              country,
+            });
+          },
+        }))
+        .concat([{ text: "Cancel", style: "cancel" }]),
+      { cancelable: true },
     );
   }, [locationSettings, updateLocationSettings]);
 
@@ -356,16 +361,18 @@ export default function Settings() {
     Alert.alert(
       "Calculation Method",
       "Choose the calculation method for prayer times. Different methods may be more accurate for different regions.",
-      methods.map((method) => ({
-        text: method.label,
-        onPress: () => {
-          updateLocationSettings({
-            ...locationSettings,
-            calculationMethod: method.value,
-          });
-        },
-      })).concat([{ text: "Cancel", style: "cancel" }]),
-      { cancelable: true }
+      methods
+        .map((method) => ({
+          text: method.label,
+          onPress: () => {
+            updateLocationSettings({
+              ...locationSettings,
+              calculationMethod: method.value,
+            });
+          },
+        }))
+        .concat([{ text: "Cancel", style: "cancel" }]),
+      { cancelable: true },
     );
   }, [locationSettings, updateLocationSettings]);
 
@@ -807,14 +814,23 @@ export default function Settings() {
                     <View className="flex-row items-center justify-between">
                       <View className="flex-row items-center flex-1">
                         <View className="w-10 h-10 bg-white/50 rounded-full items-center justify-center mr-3">
-                          <Ionicons name="calculator" size={20} color="#5B4B94" />
+                          <Ionicons
+                            name="calculator"
+                            size={20}
+                            color="#5B4B94"
+                          />
                         </View>
                         <View className="flex-1">
                           <Text className="text-base font-lato-bold text-[#4A4A4A]">
                             Calculation Method
                           </Text>
-                          <Text className="text-sm font-lato text-[#6B7280] mt-1" numberOfLines={1}>
-                            {getCalculationMethodName(locationSettings.calculationMethod)}
+                          <Text
+                            className="text-sm font-lato text-[#6B7280] mt-1"
+                            numberOfLines={1}
+                          >
+                            {getCalculationMethodName(
+                              locationSettings.calculationMethod,
+                            )}
                           </Text>
                         </View>
                       </View>
