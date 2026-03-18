@@ -1,6 +1,7 @@
 import { supabase } from "@/lib/supabase";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import getLocationPrayerTimes from "./getLocationPrayerTimes";
+import { loadLocationSettings } from "./locationSettings";
 import { PrayerTime } from "./types";
 
 /**
@@ -28,7 +29,13 @@ export const getPrayerTimes = async (
     .single();
 
   try {
-    const prayerTimes = await getLocationPrayerTimes(city); // prayer times from the api
+    const locationSettings = loadLocationSettings();
+    const prayerTimes = await getLocationPrayerTimes(
+      city,
+      undefined,
+      locationSettings.country,
+      locationSettings.calculationMethod,
+    ); // prayer times from the api
     for (let key in prayerTimes) {
       // key is the prayer name
       const formattedAdhan = to12HourFormat(
